@@ -1,9 +1,10 @@
 'use client'
 import { useState, useEffect } from 'react'
 import { Calendar, MapPin, Users, BookOpen, Star, ChevronDown } from 'lucide-react'
+import { usePortfolioData } from '@/hooks/usePortfolioData'
 
 // Unified scroll animation hook (inline for this example)
-function useScrollAnimation() {
+function useScrollAnimation(itemCount: number) {
   const [isVisible, setIsVisible] = useState(false)
   const [visibleItems, setVisibleItems] = useState<number[]>([])
 
@@ -13,11 +14,14 @@ function useScrollAnimation() {
         if (entry.isIntersecting) {
           setIsVisible(true)
           // Stagger education items
-          setTimeout(() => setVisibleItems([0]), 200)
-          setTimeout(() => setVisibleItems([0, 1]), 350)
+          for (let i = 0; i < itemCount; i++) {
+            setTimeout(() => {
+              setVisibleItems(prev => [...prev, i])
+            }, 200 + i * 150)
+          }
         }
       },
-      { 
+      {
         threshold: 0.15,
         rootMargin: '0px 0px -50px 0px'
       }
@@ -27,7 +31,7 @@ function useScrollAnimation() {
     if (section) observer.observe(section)
 
     return () => observer.disconnect()
-  }, [])
+  }, [itemCount])
 
   return { isVisible, visibleItems }
 }
@@ -35,49 +39,10 @@ function useScrollAnimation() {
 export function Education() {
   const [activeScroll, setActiveScroll] = useState<number | null>(null)
   const [isMobile, setIsMobile] = useState(false)
-  const { isVisible, visibleItems } = useScrollAnimation()
+  const { data, loading } = usePortfolioData()
 
-  const education = [
-    {
-      id: 1,
-      degree: "Master of Science",
-      field: "Computer Science",
-      university: "University of Florida",
-      location: "Gainesville, FL, USA",
-      duration: "2024 - 2026",
-      status: "In Progress",
-      gpa: "3.94/4.0",
-      highlights: [
-        "Member - Women in Computer Science and Engineering (WiCSE), UF",
-      ],
-      relevantCourses: [
-        "Advanced Data Structures", "Analysis of Algorithms", "Distributed Systems", "Math for Intelligent Systems","Machine Learning", "Natural Language Processing",  "Bioinformatics"
-      ],
-      color: "purple",
-      logo: "UF"
-    },
-    {
-      id: 2,
-      degree: "Bachelor of Science", 
-      field: "Information Technology",
-      university: "Vishwakarma Institute of Technology (Pune University)",
-      location: "Pune, Maharashtra, India", 
-      duration: "2019 - 2023",
-      status: "Completed",
-      gpa: "9.62/10",
-      highlights: [
-        "Executive Committee Member - IEEE Student Branch, VIT",
-        "Machine Learning Trainer - GedIT Coding Club, VIT",
-        "Utkarsh Best Volunteer - Social Welfare and Development, VIT",
-      ],
-      relevantCourses: [
-        "Data Structures", "Object Oriented Programming", "Design and Analysis of Algorithm", "Database Management System", "Computer Architecture and Operating System","Cloud Computing",
-        "Data Communication and Networking", "Artificial Intelligence", "Image Processing and CV", "Data Science", "System Programming" 
-      ],
-      color: "blue",
-      logo: "VIT"
-    }
-  ]
+  const education = data?.education ?? []
+  const { isVisible, visibleItems } = useScrollAnimation(education.length)
 
   // Detect mobile/touch devices
   useEffect(() => {
