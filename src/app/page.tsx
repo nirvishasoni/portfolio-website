@@ -265,7 +265,7 @@ export default function Home() {
                 </a>
                 
                 <a
-                  href="https://github.com/Nirvisha82"
+                  href="https://github.com/nirvishasoni"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="group p-2 sm:p-3 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800/50 transition-all duration-300"
